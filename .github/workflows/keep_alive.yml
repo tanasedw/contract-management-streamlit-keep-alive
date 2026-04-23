@@ -13,14 +13,15 @@ jobs:
         run: |
           echo "Pinging contract-management app..."
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            -L \
             --max-time 60 \
-            --retry 3 \
+            --max-redirs 5 \
+            --retry 2 \
             --retry-delay 10 \
             "https://contract-management-app.streamlit.app/")
           echo "HTTP Status: $STATUS"
-          if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
-            echo "✅ App is awake (status $STATUS)"
+          if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 500 ]; then
+            echo "✅ Ping sent (status $STATUS)"
           else
             echo "⚠️  Unexpected status: $STATUS"
+            exit 1
           fi
